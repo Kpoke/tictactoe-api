@@ -1,7 +1,10 @@
+require("dotenv").config();
 const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
-const { getOpponent, chooseSides } = require("./utils");
+const mongoose = require("mongoose");
+const routes = require("./api/routes");
+const { getOpponent, chooseSides } = require("./utilities/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -9,17 +12,29 @@ const io = socketio(server);
 
 const port = process.env.PORT || 3001;
 
+app.use(express.json());
+
+routes(app);
+
+mongoose.connect(process.env.DATABASEURL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+});
+
 io.on("connection", (socket) => {
   console.log("New WebSocket connection");
 
-  socket.on("play", (payload) => console.log(payload));
+  socket.on("play", ({ box, opponentId }) =>
+    socket.to(opponentId).emit("play", box)
+  );
 
   socket.on("setPlayers", (username) => {
     socket.name = username;
     socket.join("waiting");
     io.in("waiting").clients((error, clients) => {
       if (error) throw error;
-      console.log(clients);
       const opponentId = getOpponent(socket.id, clients);
       if (opponentId) {
         io.of("/").connected[opponentId].leave("waiting");
