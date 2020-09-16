@@ -3,8 +3,10 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const routes = require("./api/routes");
 const { getOpponent, chooseSides } = require("./utilities/utils");
+const socketAddPoints = require("./services/socketAddPoints");
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +15,7 @@ const io = socketio(server);
 const port = process.env.PORT || 3001;
 
 app.use(express.json());
+app.use(cors());
 
 routes(app);
 
@@ -22,6 +25,8 @@ mongoose.connect(process.env.DATABASEURL, {
   useFindAndModify: false,
   useCreateIndex: true,
 });
+
+//emit something when user signs up  to refresh leaderboard
 
 io.on("connection", (socket) => {
   console.log("New WebSocket connection");
@@ -35,7 +40,7 @@ io.on("connection", (socket) => {
     socket.join("waiting");
     io.in("waiting").clients((error, clients) => {
       if (error) throw error;
-      const opponentId = getOpponent(socket.id, clients);
+      const opponentId = getOpponent(socket, clients, io);
       if (opponentId) {
         io.of("/").connected[opponentId].leave("waiting");
         socket.leave("waiting");
@@ -52,6 +57,12 @@ io.on("connection", (socket) => {
         });
       }
     });
+  });
+  socket.on("updateuserpoints", async (token) => {
+    const error = await socketAddPoints(token);
+    if (error) return socket.emit("an error", error);
+
+    socket.emit("updated");
   });
 
   socket.on("disconnect", () => console.log("disconnected"));

@@ -1,5 +1,6 @@
 const checkUser = require("../utilities/checkUser"),
   signup = require("../services/signup"),
+  getLeaders = require("../services/getLeaders"),
   login = require("../services/login");
 
 const controllers = {
@@ -41,6 +42,15 @@ const controllers = {
       res.status(201).send({ token, user: user.toJSON() });
     } catch (e) {
       res.status(400).send(e.message);
+    }
+  },
+
+  getLeaderboard: async (req, res) => {
+    try {
+      const leaders = await getLeaders();
+      res.status(200).send({ leaders });
+    } catch (e) {
+      res.status(500).send(e.message);
     }
   },
 };

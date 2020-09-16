@@ -14,7 +14,10 @@ var UserSchema = new mongoose.Schema({
     minlength: 7,
     trim: true,
   },
-  points: Number,
+  points: {
+    type: Number,
+    default: 0,
+  },
 });
 
 UserSchema.methods.toJSON = function () {

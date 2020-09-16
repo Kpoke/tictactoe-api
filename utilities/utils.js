@@ -1,5 +1,11 @@
-const getOpponent = (myId, allPlayers) => {
-  const availablePlayers = allPlayers.filter((clientId) => clientId !== myId);
+const getOpponent = (socket, allPlayers, io) => {
+  const availablePlayers = allPlayers.filter((clientId) => {
+    if (
+      clientId !== socket.id &&
+      socket.name !== io.of("/").connected[clientId].name
+    )
+      return true;
+  });
   if (availablePlayers.length > 0)
     return availablePlayers[
       Math.floor(Math.random() * availablePlayers.length)
