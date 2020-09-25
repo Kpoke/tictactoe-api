@@ -32,7 +32,7 @@ const controllers = {
         .send({ error: "Must provide Username or Password" });
     }
     try {
-      const user = await checkUser(username);
+      const user = await checkUser(username.toLowerCase());
       if (!user) {
         throw new Error("Invalid username or password");
       }
