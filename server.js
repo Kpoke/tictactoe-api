@@ -26,10 +26,12 @@ mongoose.connect(process.env.DATABASEURL, {
   useCreateIndex: true,
 });
 
-//emit something when user signs up  to refresh leaderboard
-
 io.on("connection", (socket) => {
   console.log("New WebSocket connection");
+
+  socket.on("winner", ({ side, opponentId }) => {
+    socket.to(opponentId).emit("winner", side);
+  });
 
   socket.on("play", ({ box, opponentId }) =>
     socket.to(opponentId).emit("play", box)
