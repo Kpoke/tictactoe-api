@@ -11,11 +11,7 @@ const controllers = {
       if (newUser) {
         throw new Error("Username already exists");
       }
-      const { token, user } = await signup(
-        username.toLowerCase(),
-        password,
-        isAdmin
-      );
+      const { token, user } = await signup(username.toLowerCase(), password);
       res.status(201).send({ token, user });
     } catch (e) {
       res.status(400).send(e.message);
