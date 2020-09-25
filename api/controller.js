@@ -6,8 +6,6 @@ const checkUser = require("../utilities/checkUser"),
 const controllers = {
   signup: async (req, res) => {
     const { username, password } = req.body;
-    let isAdmin = false;
-    req.body.isAdmin ? (isAdmin = req.body.isAdmin) : (isAdmin = false);
     try {
       const newUser = await checkUser(username.toLowerCase());
       if (newUser) {
