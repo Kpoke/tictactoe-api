@@ -21,4 +21,14 @@ const chooseSides = () => {
   return { side1, side2 };
 };
 
-module.exports = { getOpponent, chooseSides };
+const resetPlayers = (socket1, socket2) => {
+  socket1.gameover = true;
+  socket2.gameover = true;
+  socket1.opponent = null;
+  socket2.opponent = null;
+  socket1.side = null;
+  socket2.side = null;
+  socket1.time.reset();
+  socket2.time.reset();
+};
+module.exports = { getOpponent, chooseSides, resetPlayers };
