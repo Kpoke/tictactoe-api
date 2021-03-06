@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
@@ -122,6 +122,10 @@ io.on("connection", (socket) => {
         );
       }
     });
+  });
+
+  socket.on("cancel", () => {
+    socket.leave("waiting");
   });
   socket.on("updateuserpoints", async (token) => {
     const error = await socketAddPoints(token);
